@@ -40,7 +40,7 @@ def depth_first(node, target)
       depth_first(child, target)
     end
   end
-  return "Found your target - #{node.payload}" if node.payload == target
+  return 'Found your target' if node.payload == target
   'No luck'
 end
 
@@ -53,28 +53,25 @@ end
 
 def breadth_first(node, target)
   # Setup
-  @queue = Queue.new
-  @queue.enqueue(node)
+  queue = Queue.new
+  queue.enqueue(node)
   # While queue exists
-  while @queue
+  while queue
     # Pop bottom off
-    current_node = @queue.dequeue
+    current_node = queue.dequeue
     # Check if it is target or nil
-    if current_node.payload == target
-      return "Found your target - #{current_node.payload}"
-    elsif current_node.nil?
-      return 'We could not locate your payload'
-    end
+    return 'Could not locate your payload :(' if current_node.nil?
+    return 'Found your target' if current_node.payload == target
     # Otherwise add its children to
     # back of line for checking
-    add_kids_to_queue(current_node)
+    add_kids_to_queue(current_node, queue)
   end
 end
 
-def add_kids_to_queue(node)
+def add_kids_to_queue(node, queue)
   if node.children
     node.children.each do |child|
-      @queue.enqueue(child)
+      queue.enqueue(child)
     end
   end
 end
@@ -95,5 +92,6 @@ shallow_fifth_node = Tree.new(5, [ninth_node])
 # The "Trunk" of the tree
 trunk = Tree.new(2, [seventh_node, shallow_fifth_node])
 
+# Runs both methods displaying output to console
 puts depth_first(trunk, 2)
-puts breadth_first(trunk, 7)
+puts breadth_first(trunk, 4)
