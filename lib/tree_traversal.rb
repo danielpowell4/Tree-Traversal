@@ -1,4 +1,5 @@
-# This is a tree it has a payload and a children
+# This is a tree
+# It has a payload and - potentially - children
 class Tree
   attr_accessor :payload, :children
 
@@ -8,8 +9,11 @@ class Tree
   end
 end
 
-# This is a first in first out queue much like a stack
+# This is a first in first out queue
+# It functions much like a stack
 class Queue
+  attr_accessor :queue
+
   def initialize
     @queue = []
   end
@@ -21,27 +25,56 @@ class Queue
   def dequeue
     @queue.shift
   end
+end
 
-  def breadth_first(node, target)
-    puts node.payload
-    return 'unable to locate payload' if node.nil?
+# This is the depth first method
+#
+# It uses recursion to dive deep as possible. When there are no more
+# children, it checks if the payload matches the target before backing
+# downwards. It eventually gives up when the first_node has no more children
+# and doesn't match the payload.
 
+def depth_first(node, target)
+  if node.children
     node.children.each do |child|
-      enqueue(child) unless child.nil?
-      return 'Payload has been found!' if child.payload == target
+      depth_first(child, target)
     end
-
-    current_node = dequeue
-    breadth_first(current_node, target)
   end
+  return "Found your target - #{node.payload}" if node.payload == target
+  'No luck'
+end
 
-  def depth_first(node, target)
-    return 'unable to locate payload' if node.nil?
+# This is the breadth first method
+#
+# As it works its way through the tree, it adds what it finds to a queue.
+# Because items are dequeued based on the order they come in a first-in,
+# first-out (FIFO) fashion, the leaves are evaulated at the end the trunk
+# at the beginning after its branches.
+
+def breadth_first(node, target)
+  # Setup
+  @queue = Queue.new
+  @queue.enqueue(node)
+  # While queue exists
+  while @queue
+    # Pop bottom off
+    current_node = @queue.dequeue
+    # Check if it is target or nil
+    if current_node.payload == target
+      return "Found your target - #{current_node.payload}"
+    elsif current_node.nil?
+      return 'We could not locate your payload'
+    end
+    # Otherwise add its children to
+    # back of line for checking
+    add_kids_to_queue(current_node)
+  end
+end
+
+def add_kids_to_queue(node)
+  if node.children
     node.children.each do |child|
-      unless child.nil?
-        breadth_first(child, target)
-        return 'Payload has been found!' if child.payload == target
-      end
+      @queue.enqueue(child)
     end
   end
 end
@@ -62,6 +95,5 @@ shallow_fifth_node = Tree.new(5, [ninth_node])
 # The "Trunk" of the tree
 trunk = Tree.new(2, [seventh_node, shallow_fifth_node])
 
-queue = Queue.new
-puts queue.breadth_first(trunk, 11)
-puts queue.depth_first(trunk, 2)
+puts depth_first(trunk, 2)
+puts breadth_first(trunk, 7)
