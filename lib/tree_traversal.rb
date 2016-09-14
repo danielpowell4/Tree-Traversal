@@ -25,6 +25,10 @@ class Queue
   def dequeue
     @queue.shift
   end
+
+  def elements?
+    @queue.any?
+  end
 end
 
 # This is the depth first method
@@ -56,7 +60,7 @@ def breadth_first(node, target)
   queue = Queue.new
   queue.enqueue(node)
   # While queue exists
-  while queue
+  while queue.elements?
     # Pop bottom off
     current_node = queue.dequeue
     # Check if it is target or nil
